@@ -1,10 +1,10 @@
 //taille de la table de hachage
-int size = 0;
+#define TABLE_SIZE 128
 
 typedef struct data {
-   int key;
-   int value;
+   int key; //@IP
+   char* value; //hash du fichier
 } hash;
 
-void add(int key, int value, hash* hash_table);
+void add(int key, char* value, hash hash_table[]);
 void exit_error(char* msg, int sockfd);

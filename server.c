@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h> //close
-#include <string.h> //memset
+#include <string.h> //memset, strstr
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -17,11 +17,12 @@ int main(int argc, char **argv) {
   int sockfd;
   char buf[1024];
 	socklen_t addrlen;
+  char* action;
 
   struct sockaddr_in6 my_addr;
   struct sockaddr_in6 client;
 
-  hash hash_table[size];
+  hash hash_table[TABLE_SIZE];
 
   //arguments
   if(argc != 3) {
@@ -48,15 +49,31 @@ int main(int argc, char **argv) {
 		exit_error("recvfrom", sockfd);
 	}
 
-  // reception d'un message
+  // réception d'un message
 	if(recvfrom(sockfd, buf, 1024, 0, (struct sockaddr *) &client, &addrlen) == -1) {
 		exit_error("recvfrom", sockfd);
 	}
 
-  //act
+  //décomposer le message envoyé par le client (GET/PUT + hash)
+  //savoir si le buffer contient "GET"
+  if(strstr(buf, "GET") != NULL) { // remplacer par une découpe de la chaîne de caractères
+    action = "GET";
 
+  } else if (strstr(buf, "PUT") != NULL) {
+    action = "PUT";
+  }
 
+  if(strcmp(action, "GET") == 0) {
+    //renvoyer les IP en possession de ce hash
 
+  } else if(strcmp(action, "PUT")) {
+    //le client indique qu'il a le fichier
+    add(42, buf, hash_table); //remplacer buf par le hash récupéré
+    //adresse du client : client.sin_addr ?
+
+  } else {
+    printf("Le message reçu n'a pas été traité\n");
+  }
 
   close(sockfd);
 
@@ -66,25 +83,19 @@ int main(int argc, char **argv) {
 /**
  *  Ajouter un hash dans la table
  */
-void add(int key, int value, hash hash_table[]) {
-  // hash *new;
-  // int compteur;
-  //
-  // new = malloc(sizeof(hash)); //FREE
-  // if(new == NULL)
-  //   exit_error("Impossible d'allouer la mémoire pour l'ajout d'un hash dans la table", 0);
-  //
-  // new->key = key;
-  // new->value = value;
-  //
-  // //rencontrer une case vide
-  // while(hash_table[compteur] != NULL) {
-  //   compteur++;
-  //   printf("Index du tableau : %d\n", compteur); //debug
+void add(int key, char* value, hash hash_table[]) {
+  int index = (key % TABLE_SIZE);
+
+  printf("%s\n", hash_table[index].value);
+
+  // while (hash_table[index].value != 0 && hash_table[index].value != key) {
+    index = (index + 1) % TABLE_SIZE;
   // }
-  //
-  // hash_table[compteur] = *new;
-  // size++;
+
+  printf("Index choisi : %d", index);
+
+  hash_table[index].key = key;
+  hash_table[index].value = value;
 }
 
 /**
