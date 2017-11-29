@@ -1,11 +1,10 @@
 /**
  * Serveur en charge d'une table de hachage
  */
-
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h> //close
-#include <string.h> //memset, strstr
+#include <unistd.h> // close
+#include <string.h> // memset, strstr
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -13,63 +12,61 @@
 
 #include "server.h"
 
-int main(int argc, char **argv) {
+int main(int argc, char * argv[]) {
   int sockfd;
-  char buf[1024];
-	socklen_t addrlen;
-  char* action;
+  char buf[BUFF_SIZE];
+  socklen_t addrlen;
+  char * action;
 
   struct sockaddr_in6 my_addr;
   struct sockaddr_in6 client;
 
   hash hash_table[TABLE_SIZE];
 
-  //arguments
-  if(argc != 3) {
+  // arguments
+  if (argc != 3) {
     exit_error("usage: ./server IP PORT", 0);
   }
 
-  //création du socket IPv6
-  if((sockfd = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP)) == -1)
-	{
-		exit_error("socket", 0);
-	}
+  // création du socket IPv6
+  if ((sockfd = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
+    exit_error("socket", 0);
+  }
 
   //initialisation
   my_addr.sin6_family = AF_INET6;
   my_addr.sin6_port   = htons(atoi(argv[1]));
   my_addr.sin6_addr   = in6addr_any;
   addrlen             = sizeof(struct sockaddr_in6);
-	memset(buf,'\0',1024);
+  memset(buf, '\0', BUFF_SIZE);
 
 
   // lien entre adresse locale et socket
-	if(bind(sockfd, (struct sockaddr *) &my_addr, addrlen) == -1)
-	{
-		exit_error("recvfrom", sockfd);
-	}
+  if (bind(sockfd, (struct sockaddr *) &my_addr, addrlen) == -1) {
+    exit_error("recvfrom", sockfd);
+  }
 
   // réception d'un message
-	if(recvfrom(sockfd, buf, 1024, 0, (struct sockaddr *) &client, &addrlen) == -1) {
-		exit_error("recvfrom", sockfd);
-	}
+  if (recvfrom(sockfd, buf, BUFF_SIZE, 0, (struct sockaddr *) &client, &addrlen) == -1) {
+    exit_error("recvfrom", sockfd);
+  }
 
-  //décomposer le message envoyé par le client (GET/PUT + hash)
-  //savoir si le buffer contient "GET"
-  if(strstr(buf, "GET") != NULL) { // remplacer par une découpe de la chaîne de caractères
+  // décomposer le message envoyé par le client (GET/PUT + hash)
+  // savoir si le buffer contient "GET"
+  if (strstr(buf, "GET") != NULL) { // remplacer par une découpe de la chaîne de caractères
     action = "GET";
 
   } else if (strstr(buf, "PUT") != NULL) {
     action = "PUT";
   }
 
-  if(strcmp(action, "GET") == 0) {
-    //renvoyer les IP en possession de ce hash
+  if (strcmp(action, "GET") == 0) {
+    // renvoyer les IP en possession de ce hash
 
-  } else if(strcmp(action, "PUT")) {
-    //le client indique qu'il a le fichier
-    add(42, buf, hash_table); //remplacer buf par le hash récupéré
-    //adresse du client : client.sin_addr ?
+  } else if (strcmp(action, "PUT")) {
+    // le client indique qu'il a le fichier
+    add(42, buf, hash_table); // remplacer buf par le hash récupéré
+    // adresse du client : client.sin_addr ?
 
   } else {
     printf("Le message reçu n'a pas été traité\n");
