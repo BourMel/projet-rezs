@@ -11,6 +11,8 @@
 #include <arpa/inet.h>
 
 #include "server.h"
+//fonctions de la table de hachage
+#include "hash.c"
 
 int main(int argc, char * argv[]) {
   int sockfd;
@@ -21,7 +23,7 @@ int main(int argc, char * argv[]) {
   struct sockaddr_in6 my_addr;
   struct sockaddr_in6 client;
 
-  hash hash_table[TABLE_SIZE];
+  hash* hash_table[TABLE_SIZE];
 
   // arguments
   if (argc != 3) {
@@ -40,7 +42,6 @@ int main(int argc, char * argv[]) {
   addrlen             = sizeof(struct sockaddr_in6);
   memset(buf, '\0', BUFF_SIZE);
 
-
   // lien entre adresse locale et socket
   if (bind(sockfd, (struct sockaddr *) &my_addr, addrlen) == -1) {
     exit_error("recvfrom", sockfd);
@@ -50,6 +51,8 @@ int main(int argc, char * argv[]) {
   if (recvfrom(sockfd, buf, BUFF_SIZE, 0, (struct sockaddr *) &client, &addrlen) == -1) {
     exit_error("recvfrom", sockfd);
   }
+
+  printf("BUFFER : %s\n", buf);
 
   // décomposer le message envoyé par le client (GET/PUT + hash)
   // savoir si le buffer contient "GET"
@@ -65,7 +68,7 @@ int main(int argc, char * argv[]) {
 
   } else if (strcmp(action, "PUT")) {
     // le client indique qu'il a le fichier
-    add(42, buf, hash_table); // remplacer buf par le hash récupéré
+    put(42, buf, hash_table); // remplacer buf par le hash récupéré
     // adresse du client : client.sin_addr ?
 
   } else {
@@ -75,24 +78,6 @@ int main(int argc, char * argv[]) {
   close(sockfd);
 
   return 0;
-}
-
-/**
- *  Ajouter un hash dans la table
- */
-void add(int key, char* value, hash hash_table[]) {
-  int index = (key % TABLE_SIZE);
-
-  printf("%s\n", hash_table[index].value);
-
-  // while (hash_table[index].value != 0 && hash_table[index].value != key) {
-    index = (index + 1) % TABLE_SIZE;
-  // }
-
-  printf("Index choisi : %d", index);
-
-  hash_table[index].key = key;
-  hash_table[index].value = value;
 }
 
 /**
