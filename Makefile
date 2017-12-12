@@ -25,7 +25,7 @@ get-client: client
 # only for some tests
 .PHONY: test
 test: hash.o test.c
-	gcc test.c hash.o -Werror -Wextra -Wall -o test
+	gcc test.c hash.o -Wextra -Wall -o test
 
 .PHONY: clean
 clean:
