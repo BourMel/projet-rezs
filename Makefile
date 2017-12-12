@@ -1,11 +1,14 @@
 .PHONY: all
-all: server
+all: server client
 
-server: server.c server.h
-	gcc server.c -Werror -Wextra -Wall -o server
+hash.o: hash.c hash.h
+	gcc -c hash.c -Werror -Wextra -Wall -o hash.o
+
+server: server.c hash.o
+	gcc hash.o server.c -Werror -Wextra -Wall -o server
 
 client: client.c
-	gcc client.c -Werror -Wextra -Wall -o client
+	gcc hash.o client.c -Werror -Wextra -Wall -o client
 
 .PHONY: run-server
 run-server: server
@@ -18,3 +21,12 @@ put-client: client
 .PHONY: get-client
 get-client: client
 	./client ::1 9000 get 394c8a052d
+
+# only for some tests
+.PHONY: test
+test: hash.o test.c
+	gcc test.c hash.o -Werror -Wextra -Wall -o test
+
+.PHONY: clean
+clean:
+	cat .gitignore | xargs -n1 rm -f

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "hash.h"
 
 /**
  * Déduit un index à partir de l'adresse IP
@@ -15,8 +16,8 @@ int hash_value(int key) {
 void display(hash** array) {
   int index = 0;
 
-  while(index < TABLE_SIZE) {
-    if(array[index] != NULL) {
+  while (index < TABLE_SIZE) {
+    if (array[index] != NULL) {
         printf("[ %d | %s ] ", array[index]->ip, array[index]->file);
     } else {
       printf("[ - | - ] ");
@@ -37,7 +38,7 @@ void put(int key, char* value, hash** array) {
   new->ip = key;
   new->file = value;
 
-  while(array[index] != NULL && array[index]->ip != -1) {
+  while (array[index] != NULL && array[index]->ip != -1) {
      index = hash_value(index);
      index++;
   }
@@ -48,8 +49,8 @@ void put(int key, char* value, hash** array) {
 hash* get(int key, hash** array) {
    int index = hash_value(key);
 
-   while(array[index] != NULL) {
-      if(array[index]->ip == key) {
+   while (array[index] != NULL) {
+      if (array[index]->ip == key) {
          return array[index];
       }
       index = hash_value(index);

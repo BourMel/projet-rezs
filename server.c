@@ -10,9 +10,8 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
-#include "server.h"
-//fonctions de la table de hachage
-#include "hash.c"
+// fonctions de la table de hachage
+#include "hash.h"
 
 int main(int argc, char * argv[]) {
   int sockfd;
@@ -86,6 +85,6 @@ int main(int argc, char * argv[]) {
  */
 void exit_error(char* msg, int sockfd) {
   perror(msg);
-  if(sockfd == 0) close(sockfd);
+  if (sockfd == 0) close(sockfd);
   exit(EXIT_FAILURE);
 }
