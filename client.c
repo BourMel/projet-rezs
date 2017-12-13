@@ -12,10 +12,10 @@ int main(int argc, char **argv) {
   struct sockaddr_in6 dest;
 
   // check the number of args on command line
-  if (argc != 4) {
-    printf("USAGE: %s @dest port_num string\n", argv[0]);
-    exit(-1);
-  }
+  if(argc != 5 && argc != 6) {
+        printf("USAGE: %s @dest port_num commande hash [ip]\n", argv[0]);
+        exit(-1);
+	}
 
   // socket factory
   if ((sockfd = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
