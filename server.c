@@ -1,90 +1,58 @@
-/**
- * Serveur en charge d'une table de hachage
- */
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h> // close
-#include <string.h> // memset, strstr
-
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <string.h>
 #include <arpa/inet.h>
+#include "dht.h"
 
-// fonctions de la table de hachage
-#include "hash.h"
-
-int main(int argc, char * argv[]) {
+int main(int argc, char **argv) {
   int sockfd;
-  char buf[BUFF_SIZE];
+  char buf[1024];
   socklen_t addrlen;
-  char * action;
 
   struct sockaddr_in6 my_addr;
   struct sockaddr_in6 client;
 
-  hash* hash_table[TABLE_SIZE];
-
-  // arguments
-  if (argc != 3) {
-    exit_error("usage: ./server IP PORT", 0);
+  // check the number of args on command line
+  if (argc != 2) {
+    printf("Usage: %s local_port\n", argv[0]);
+    exit(-1);
   }
 
-  // création du socket IPv6
+  // socket factory
   if ((sockfd = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
-    exit_error("socket", 0);
+    perror("socket");
+    exit(EXIT_FAILURE);
   }
 
-  //initialisation
-  my_addr.sin6_family = AF_INET6;
-  my_addr.sin6_port   = htons(atoi(argv[1]));
-  my_addr.sin6_addr   = in6addr_any;
-  addrlen             = sizeof(struct sockaddr_in6);
-  memset(buf, '\0', BUFF_SIZE);
+  // init local addr structure and other params
+  my_addr.sin6_family      = AF_INET6;
+  my_addr.sin6_port        = htons(atoi(argv[1]));
+  my_addr.sin6_addr        = in6addr_any;
+  addrlen                  = sizeof(struct sockaddr_in6);
+  memset(buf,'\0',1024);
 
-  // lien entre adresse locale et socket
+  // bind addr structure with socket
   if (bind(sockfd, (struct sockaddr *) &my_addr, addrlen) == -1) {
-    exit_error("recvfrom", sockfd);
+    perror("bind");
+    close(sockfd);
+    exit(EXIT_FAILURE);
   }
 
-  // réception d'un message
-  if (recvfrom(sockfd, buf, BUFF_SIZE, 0, (struct sockaddr *) &client, &addrlen) == -1) {
-    exit_error("recvfrom", sockfd);
+  // reception de la chaine de caracteres
+  if (recvfrom(sockfd, buf, 1024, 0, (struct sockaddr *) &client, &addrlen) == -1) {
+    perror("recvfrom");
+    close(sockfd);
+    exit(EXIT_FAILURE);
   }
 
-  printf("BUFFER : %s\n", buf);
+  // print the received char
+  printf("%s\n", buf);
 
-  // décomposer le message envoyé par le client (GET/PUT + hash)
-  // savoir si le buffer contient "GET"
-  if (strstr(buf, "GET") != NULL) { // remplacer par une découpe de la chaîne de caractères
-    action = "GET";
-
-  } else if (strstr(buf, "PUT") != NULL) {
-    action = "PUT";
-  }
-
-  if (strcmp(action, "GET") == 0) {
-    // renvoyer les IP en possession de ce hash
-
-  } else if (strcmp(action, "PUT")) {
-    // le client indique qu'il a le fichier
-    put(42, buf, hash_table); // remplacer buf par le hash récupéré
-    // adresse du client : client.sin_addr ?
-
-  } else {
-    printf("Le message reçu n'a pas été traité\n");
-  }
-
+  // close the socket
   close(sockfd);
 
-  return 0;
-}
-
-/**
- * Affichage des erreurs et clôture du programme.
- * S'il n'y a pas de socket créé, indiquer sockfd = 0
- */
-void exit_error(char* msg, int sockfd) {
-  perror(msg);
-  if (sockfd == 0) close(sockfd);
-  exit(EXIT_FAILURE);
+  return EXIT_SUCCESS;
 }
