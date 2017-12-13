@@ -5,6 +5,11 @@
 #include <unistd.h>
 #include <string.h>
 #include <arpa/inet.h>
+
+//fonctions générales
+#include "prog.h"
+#include "prog.c" //@TODO ne marchait pas sans...
+//fonctions de la DHT
 #include "dht.h"
 
 int main(int argc, char **argv) {
@@ -15,44 +20,34 @@ int main(int argc, char **argv) {
   struct sockaddr_in6 my_addr;
   struct sockaddr_in6 client;
 
-  // check the number of args on command line
+  //arguments
   if (argc != 3) {
     printf("Usage: %s domain/IP local_port\n", argv[0]);
     exit(-1);
   }
 
-  // socket factory
   if ((sockfd = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
-    perror("socket");
-    exit(EXIT_FAILURE);
+    exit_error("socket", 0);
   }
 
-  // init local addr structure and other params
   my_addr.sin6_family      = AF_INET6;
   my_addr.sin6_port        = htons(atoi(argv[2]));
   my_addr.sin6_addr        = in6addr_any;
   addrlen                  = sizeof(struct sockaddr_in6);
   memset(buf,'\0',1024);
 
-  // bind addr structure with socket
+  //lie l'adresse locale au socket
   if (bind(sockfd, (struct sockaddr *) &my_addr, addrlen) == -1) {
-    perror("bind");
-    close(sockfd);
-    exit(EXIT_FAILURE);
+    exit_error("bind", sockfd);
   }
 
   // reception de la chaine de caracteres
   if (recvfrom(sockfd, buf, 1024, 0, (struct sockaddr *) &client, &addrlen) == -1) {
-    perror("recvfrom");
-    close(sockfd);
-    exit(EXIT_FAILURE);
+    exit_error("recvfrom", sockfd);
   }
 
-  // print the received char
   printf("%s\n", buf);
 
-  // close the socket
   close(sockfd);
-
   return EXIT_SUCCESS;
 }
