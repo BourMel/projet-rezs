@@ -14,7 +14,7 @@
 
 int main(int argc, char **argv) {
   int sockfd;
-  char buf[1024];
+  char buf[BUFF_SIZE];
   socklen_t addrlen;
 
   struct sockaddr_in6 my_addr;
@@ -34,19 +34,21 @@ int main(int argc, char **argv) {
   my_addr.sin6_port        = htons(atoi(argv[2]));
   my_addr.sin6_addr        = in6addr_any;
   addrlen                  = sizeof(struct sockaddr_in6);
-  memset(buf,'\0',1024);
+  memset(buf,'\0',BUFF_SIZE);
 
   //lie l'adresse locale au socket
   if (bind(sockfd, (struct sockaddr *) &my_addr, addrlen) == -1) {
     exit_error("bind", sockfd);
   }
 
-  // reception de la chaine de caracteres
-  if (recvfrom(sockfd, buf, 1024, 0, (struct sockaddr *) &client, &addrlen) == -1) {
+  // reception de la structure de données
+  if (recvfrom(sockfd, buf, BUFF_SIZE, 0, (struct sockaddr *) &client, &addrlen) == -1) {
     exit_error("recvfrom", sockfd);
   }
 
   printf("%s\n", buf);
+
+
 
   close(sockfd);
   return EXIT_SUCCESS;
