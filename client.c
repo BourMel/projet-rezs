@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
     printf("USAGE: %s @dest port_num commande hash [ip]\n", argv[0]);
     exit(EXIT_FAILURE);
   }
-
+ 
 	if ((sockfd = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
 		perror("socket");
 		exit(EXIT_FAILURE);

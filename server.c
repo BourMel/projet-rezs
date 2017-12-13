@@ -11,7 +11,19 @@
 #include <arpa/inet.h>
 
 // fonctions de la table de hachage
-#include "hash.h"
+#include "dht.h"
+
+#define BUFF_SIZE 1024
+
+/**
+ * Affichage des erreurs et clôture du programme.
+ * S'il n'y a pas de socket créé, indiquer sockfd = 0
+ */
+void exit_error(char* msg, int sockfd) {
+  perror(msg);
+  if (sockfd == 0) close(sockfd);
+  exit(EXIT_FAILURE);
+}
 
 int main(int argc, char * argv[]) {
   int sockfd;
@@ -22,8 +34,6 @@ int main(int argc, char * argv[]) {
   struct sockaddr_in6 my_addr;
   struct sockaddr_in6 client;
 
-  hash* hash_table[TABLE_SIZE];
-
   // arguments
   if (argc != 3) {
     exit_error("usage: ./server IP PORT", 0);
@@ -33,6 +43,8 @@ int main(int argc, char * argv[]) {
   if ((sockfd = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
     exit_error("socket", 0);
   }
+  
+	printf("DEBUG: socket créé\n");
 
   //initialisation
   my_addr.sin6_family = AF_INET6;
@@ -45,12 +57,17 @@ int main(int argc, char * argv[]) {
   if (bind(sockfd, (struct sockaddr *) &my_addr, addrlen) == -1) {
     exit_error("recvfrom", sockfd);
   }
+  
+	printf("DEBUG: bind\n");
 
   // réception d'un message
   if (recvfrom(sockfd, buf, BUFF_SIZE, 0, (struct sockaddr *) &client, &addrlen) == -1) {
     exit_error("recvfrom", sockfd);
   }
 
+	printf("DEBUG: réception\n");
+
+	printf("hello\n");
   printf("BUFFER : %s\n", buf);
 
   // décomposer le message envoyé par le client (GET/PUT + hash)
@@ -67,7 +84,7 @@ int main(int argc, char * argv[]) {
 
   } else if (strcmp(action, "PUT")) {
     // le client indique qu'il a le fichier
-    put(42, buf, hash_table); // remplacer buf par le hash récupéré
+    // put(42, buf, hash_table); // remplacer buf par le hash récupéré
     // adresse du client : client.sin_addr ?
 
   } else {
@@ -79,12 +96,3 @@ int main(int argc, char * argv[]) {
   return 0;
 }
 
-/**
- * Affichage des erreurs et clôture du programme.
- * S'il n'y a pas de socket créé, indiquer sockfd = 0
- */
-void exit_error(char* msg, int sockfd) {
-  perror(msg);
-  if (sockfd == 0) close(sockfd);
-  exit(EXIT_FAILURE);
-}
