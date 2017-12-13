@@ -16,8 +16,8 @@ int main(int argc, char **argv) {
   struct sockaddr_in6 client;
 
   // check the number of args on command line
-  if (argc != 2) {
-    printf("Usage: %s local_port\n", argv[0]);
+  if (argc != 3) {
+    printf("Usage: %s domain/IP local_port\n", argv[0]);
     exit(-1);
   }
 
@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
 
   // init local addr structure and other params
   my_addr.sin6_family      = AF_INET6;
-  my_addr.sin6_port        = htons(atoi(argv[1]));
+  my_addr.sin6_port        = htons(atoi(argv[2]));
   my_addr.sin6_addr        = in6addr_any;
   addrlen                  = sizeof(struct sockaddr_in6);
   memset(buf,'\0',1024);
