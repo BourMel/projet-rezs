@@ -1,4 +1,5 @@
 server
 client
 hash.o
+dht.o
 test

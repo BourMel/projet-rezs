@@ -1,14 +1,14 @@
 .PHONY: all
 all: server client
 
-hash.o: hash.c hash.h
-	gcc -c hash.c -Werror -Wextra -Wall -o hash.o
+dht.o: dht.c dht.h
+	gcc -c dht.c -Werror -Wextra -Wall -o dht.o
 
-server: server.c hash.o
-	gcc hash.o server.c -Werror -Wextra -Wall -o server
+server: server.c dht.o
+	gcc dht.o server.c -Werror -Wextra -Wall -o server
 
 client: client.c
-	gcc hash.o client.c -Werror -Wextra -Wall -o client
+	gcc dht.o client.c -Werror -Wextra -Wall -o client
 
 .PHONY: run-server
 run-server: server
@@ -24,8 +24,8 @@ get-client: client
 
 # only for some tests
 .PHONY: test
-test: hash.o test.c
-	gcc test.c hash.o -Wextra -Wall -o test
+test: dht.o test.c
+	gcc test.c dht.o -Wextra -Wall -o test
 
 .PHONY: clean
 clean:
