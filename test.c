@@ -40,12 +40,16 @@ dht new_dht(char * file) {
   return d;
 }
 
+// permet d'ajouter un IP à une liste d'IPs
 void ips_add(dht_ips i, char * ip) {
   int matched_ip = 0;
+
   if (i == NULL) {
     fprintf(stderr, "La liste d'IPs n'est pas initialisée.\n");
     exit(EXIT_FAILURE);
   }
+
+  // on place le curseur à la fin, sauf si on rencontre déjà l'IP en question
   while (i->next != NULL) {
     if (i->ip != NULL && !strcmp(i->ip, ip)) {
       matched_ip = 1;
@@ -53,18 +57,26 @@ void ips_add(dht_ips i, char * ip) {
     }
     i = i->next;
   }
+
+  // prise en compte du dernier cas
   if (i->ip != NULL && !strcmp(i->ip, ip)) matched_ip = 1;
+
+  // si on a pas encore vu passer l'IP dans la liste, on l'ajoute
   if (!matched_ip) {
     i->next = new_dht_ips(ip);
   }
 }
 
+// permet d'ajouter un couple (hash, ip) à la DHT
 void dht_add(dht d, char * hash, char * ip) {
   int matched_hash = 0;
+
   if (d == NULL) {
     fprintf(stderr, "La DHT n'est pas initialisée.\n");
     exit(EXIT_FAILURE);
   }
+
+  // on place le curseur à la fin, sauf si on rencontre le même hash
   while (d->next != NULL) {
     if (d->file != NULL && !strcmp(d->file, hash)) {
       matched_hash = 1;
@@ -72,6 +84,7 @@ void dht_add(dht d, char * hash, char * ip) {
     }
     d = d->next;
   }
+
   if (matched_hash) { // dans le cas d'un hash déjà connu
     if (d->ips == NULL) d->ips = new_dht_ips(ip);
     else ips_add(d->ips, ip);
