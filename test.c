@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "hash.h"
 
 // Liste chaînée d'IP
@@ -39,14 +40,45 @@ dht new_dht(char * file) {
   return d;
 }
 
+void ips_add(dht_ips i, char * ip) {
+  int matched_ip = 0;
+  if (i == NULL) {
+    fprintf(stderr, "La liste d'IPs n'est pas initialisée.\n");
+    exit(EXIT_FAILURE);
+  }
+  while (i->next != NULL) {
+    if (i->ip != NULL && !strcmp(i->ip, ip)) {
+      matched_ip = 1;
+      break;
+    }
+    i = i->next;
+  }
+  if (i->ip != NULL && !strcmp(i->ip, ip)) matched_ip = 1;
+  if (!matched_ip) {
+    i->next = new_dht_ips(ip);
+  }
+}
+
 void dht_add(dht d, char * hash, char * ip) {
+  int matched_hash = 0;
   if (d == NULL) {
     fprintf(stderr, "La DHT n'est pas initialisée.\n");
     exit(EXIT_FAILURE);
   }
-  while (d->next != NULL) d = d->next; // @TODO: ajouter strcmp d->file et hash
-  d->next = new_dht(hash);
-  d->next->ips = new_dht_ips(ip);
+  while (d->next != NULL) {
+    if (d->file != NULL && !strcmp(d->file, hash)) {
+      matched_hash = 1;
+      break;
+    }
+    d = d->next;
+  }
+  if (matched_hash) { // dans le cas d'un hash déjà connu
+    if (d->ips == NULL) d->ips = new_dht_ips(ip);
+    else ips_add(d->ips, ip);
+  } else { // dans le cas d'un nouveau hash
+    d->next = new_dht(hash);
+    d->next->ips = new_dht_ips(ip);
+  }
 }
 
 
@@ -54,21 +86,21 @@ void dht_add(dht d, char * hash, char * ip) {
 void dht_print_ips(dht_ips i) {
   if (i == NULL) return;
   while (i->next != NULL) {
-    printf("\t - %s\n", i->ip);
+    printf("    - %s\n", i->ip);
     i = i->next;
   }
-  printf("\t - %s\n", i->ip);
+  printf("    - %s\n", i->ip);
 }
 
 // fonction auxilière pour afficher le contenu d'une DHT
 void dht_print_aux(dht d) {
   if (d == NULL) return;
   if (d->ips != NULL) {
-    printf("Les IP possédant le hash '%s' sont :\n", d->file);
+    printf("  Les IP possédant le hash '%s' sont :\n", d->file);
     dht_print_ips(d->ips);
-    printf("\n\n\n");
+    printf("\n");
   } else {
-    printf("Personne ne possède le hash '%s'...\n\n", d->file);
+    printf("  Personne ne possède le hash '%s'...\n", d->file);
   }
   dht_print_aux(d->next);
 }
@@ -79,7 +111,7 @@ void dht_print(dht d) {
     fprintf(stderr, "La DHT n'est pas initialisée.\n");
     exit(EXIT_FAILURE);
   }
-  printf("La DHT contient actuellement les hash suivants :\n");
+  printf("CONTENU DE LA DHT :\n\n");
   if (d->file == NULL) dht_print_aux(d->next); // si c'est le premier
   else dht_print_aux(d);
 }
@@ -89,6 +121,8 @@ int main() {
 
   dht d = new_dht(NULL); // quand on commence, la table est vide
   dht_add(d, "hash", "ip");
+  dht_add(d, "hash2", "ip");
+  dht_add(d, "hash", "ip2");
   dht_print(d);
 
   return EXIT_SUCCESS;
