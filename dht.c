@@ -96,7 +96,7 @@ void dht_print_ips(dht_ips i) {
 void dht_print_aux(dht d) {
   if (d == NULL) return;
   if (d->ips != NULL) {
-    printf("  Les IP possédant le hash '%s' sont :\n", d->file);
+    printf("  '%s' chez :\n", d->file);
     dht_print_ips(d->ips);
     printf("\n");
   } else {
@@ -111,7 +111,7 @@ void dht_print(dht d) {
     fprintf(stderr, "La DHT n'est pas initialisée.\n");
     exit(EXIT_FAILURE);
   }
-  printf("CONTENU DE LA DHT :\n\n");
+  printf("\nCONTENU DE LA DHT :\n\n");
   if (d->file == NULL) dht_print_aux(d->next); // si c'est le premier
   else dht_print_aux(d);
 }
