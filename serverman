@@ -1,0 +1,30 @@
+.\" Man page for the server.
+
+.TH "server man page" 1
+
+.SH NAME
+server \- lance un serveur responsable de la table de hachage
+
+.SH SYNOPSIS
+.B ./server
+.I IP
+.I PORT
+
+.SH DESCRIPTION
+Lance le serveur qui initialise une table de hachage. A chaque
+fois qu'un client lui envoie une requête PUT, le serveur enregistre le hash
+reçu ; s'il reçoit une requête GET, il envoie pour réponse les IP des hôtes
+ayant indiqué posséder ce hash.
+
+.SH OPTIONS
+Aucune option n'est supportée par le programme actuellement.
+
+.SH SEE ALSO
+client(1)
+
+.SH BUGS
+Ce programme est encore en cours de développement.
+
+.SH AUTHOR
+Ludovic Muller,
+Méline Bour-Lang

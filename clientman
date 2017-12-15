@@ -1,0 +1,28 @@
+.\" Man page for the client.
+
+.TH "client man page" 1
+
+.SH NAME
+client \- récupère un hash ou indique en posséder un à un serveur
+
+.SH SYNOPSIS
+.B ./client
+.I IP
+.I PORT
+.I COMMANDE
+
+.SH DESCRIPTION
+
+
+.SH OPTIONS
+Aucune option n'est supportée par le programme actuellement.
+
+.SH SEE ALSO
+server(1)
+
+.SH BUGS
+Ce programme est encore en cours de développement.
+
+.SH AUTHOR
+Ludovic Muller,
+Méline Bour-Lang
