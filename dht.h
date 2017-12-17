@@ -64,4 +64,7 @@ dht dht_find_hash(dht d, char * hash);
 // convertit un nom de domaine en adresse IP
 int convert_ndd_to_ip(char * ndd, char * ipstr);
 
+// indique si une chaîne de caractères est une IPv6 valide ou non
+int is_valid_ip(char * ip);
+
 #endif

@@ -168,14 +168,20 @@ dht dht_find_hash(dht d, char * hash) {
 // convertit un nom de domaine en adresse IP
 int convert_ndd_to_ip(char * ndd, char * ipstr) {
   struct addrinfo hints, *res;
-  memset(&hints, 0, sizeof hints);
+  memset(&hints, 0, sizeof(hints));
   hints.ai_family = AF_INET6;
   hints.ai_socktype = SOCK_DGRAM;
   if (getaddrinfo(ndd, NULL, &hints, &res) == 0) {
     struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *) res->ai_addr;
-    inet_ntop(res->ai_family, &(ipv6->sin6_addr), ipstr, sizeof ipstr);
+    inet_ntop(res->ai_family, &(ipv6->sin6_addr), ipstr, INET6_ADDRSTRLEN);
     freeaddrinfo(res);
     return 1;
   }
   return 0;
+}
+
+// indique si une chaîne de caractères est une IPv6 valide ou non
+int is_valid_ip(char * ip) {
+  struct sockaddr_in6 sa;
+  return inet_pton(AF_INET6, ip, &(sa.sin6_addr)) != 0;
 }

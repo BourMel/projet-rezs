@@ -82,6 +82,11 @@ int main(int argc, char **argv) {
     put_ip = argv[5];
     char ndd_to_ip[INET6_ADDRSTRLEN] = { 0 };
     if (convert_ndd_to_ip(put_ip, ndd_to_ip)) put_ip = ndd_to_ip;
+    if (!is_valid_ip(put_ip)) {
+      print_error("L'IP fournie n'est pas valide.");
+      print_info_str("I", "L'IP fournie est : '%s'", put_ip);
+      exit(EXIT_FAILURE);
+    }
   }
 
   if (hash_len < 65 || hash_len > HASH_MAX_LENGTH) {

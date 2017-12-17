@@ -34,35 +34,41 @@ void reply_str(int sockfd, char * str, struct sockaddr_in6 * client, socklen_t a
 int main(int argc, char **argv) {
   int sockfd;
   char buf[BUFF_MAX_LENGTH];
+  char ipstr[INET6_ADDRSTRLEN];
   socklen_t addrlen;
 
-  struct sockaddr_in6 my_addr;
-  struct sockaddr_in6 client;
+  struct sockaddr_in6 my_addr, client;
 
-  char *hash, *p_hash, *put_ip_cursor;
+  char *hash, *p_hash, *put_ip_cursor, *server_ip;
   char put_ip[INET6_ADDRSTRLEN];
 
   int server_running = 1;
 
-  // check the number of args on command line
-  if (argc != 2) {
-    printf("Usage: %s local_port\n", argv[0]);
-    exit(-1);
+  // vérifie le nombre d'arguments
+  if (argc != 3 && argc != 5) {
+    printf("Usage: %s IP PORT [distIPserver distPORTserver]\n", argv[0]);
+    exit(EXIT_FAILURE);
   }
 
-  // socket factory
+  // création du socket
   if ((sockfd = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
     perror("socket");
     exit(EXIT_FAILURE);
   }
 
-  // init local addr structure and other params
+  // initialisation de la structure et d'autres paramètres
+  server_ip = argv[1];
+  if (convert_ndd_to_ip(server_ip, ipstr)) server_ip = ipstr;
   my_addr.sin6_family      = AF_INET6;
-  my_addr.sin6_port        = htons(atoi(argv[1]));
-  my_addr.sin6_addr        = in6addr_any;
+  my_addr.sin6_port        = htons(atoi(argv[2]));
   addrlen                  = sizeof(struct sockaddr_in6);
 
-  // bind addr structure with socket
+  if (inet_pton(AF_INET6, server_ip, &my_addr.sin6_addr) != 1) {
+    perror("inet_pton");
+    exit(EXIT_FAILURE);
+  }
+
+  // on bind la structure avec le socket
   if (bind(sockfd, (struct sockaddr *) &my_addr, addrlen) == -1) {
     perror("bind");
     close(sockfd);
@@ -74,7 +80,7 @@ int main(int argc, char **argv) {
   while (server_running) {
     memset(buf, 0, BUFF_MAX_LENGTH);
 
-    // reception de la chaine de caracteres
+    // réception de la chaine de caracteres
     if (recvfrom(sockfd, buf, BUFF_MAX_LENGTH, 0, (struct sockaddr *) &client, &addrlen) == -1) {
       perror("recvfrom");
       close(sockfd);
@@ -140,7 +146,7 @@ int main(int argc, char **argv) {
     }
   }
 
-  // close the socket
+  // on ferme le socket
   close(sockfd);
 
   return 0;
