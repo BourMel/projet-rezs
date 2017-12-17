@@ -111,7 +111,7 @@ int main(int argc, char **argv) {
         print_info("PUT", hash);
         if (strlen(put_ip)) {
           dht_add(d, hash, put_ip);
-          print_info_str("I", "Source = %s", put_ip);
+          print_info_str("I", " \\__IP ajoutée = %s", put_ip);
           dht_print(d);
         } else {
           print_error("Pas d'IP associé à ce hash. Abandon.");

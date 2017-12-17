@@ -20,7 +20,11 @@ client: dht.o client.c
 	gcc client.c dht.o -pthread -Werror -Wextra -Wall -o client
 
 server: dht.o server.c
-	gcc server.c dht.o -Werror -Wextra -Wall -o server
+	gcc server.c dht.o -pthread -Werror -Wextra -Wall -o server
+
+.PHONY: tests
+tests: client server
+	./tests.sh
 
 .PHONY: clean
 clean:
