@@ -44,14 +44,14 @@ info "TESTS DES ARGUMENTS..."
 
 info "TESTS DES LANCEMENTS..."
 ./server "$SERVER_HOST" "$SERVER_PORT"& 2> tests.log >&2 || fail "Le serveur n'a pas pu démarrer"
-./client "$SERVER_HOST" "$SERVER_PORT" put "$HASH_EXAMPLE" ::42 & 2> tests.log >&2 || fail "Le client 1 n'a pas pu se lancer"
-./client "$SERVER_HOST" "$SERVER_PORT" put "$HASH_EXAMPLE" localhost & 2> tests.log >&2 || fail "Le client 2 n'a pas pu se lancer"
-./client "$SERVER_HOST" "$SERVER_PORT" put "$HASH_EXAMPLE" ::1 & 2> tests.log >&2 || fail "Le client 3 n'a pas pu se lancer"
-./client "$SERVER_HOST" "$SERVER_PORT" put "$HASH_EXAMPLE"1 ::42 & 2> tests.log >&2 || fail "Le client 4 n'a pas pu se lancer"
-./client "$SERVER_HOST" "$SERVER_PORT" put "$HASH_EXAMPLE"2 ::432 & 2> tests.log >&2 || fail "Le client 5 n'a pas pu se lancer"
-./client "$SERVER_HOST" "$SERVER_PORT" put "$HASH_EXAMPLE"2 ::42 & 2> tests.log >&2 || fail "Le client 6 n'a pas pu se lancer"
-./client "$SERVER_HOST" "$SERVER_PORT" put "$HASH_EXAMPLE"2 ::432 & 2> tests.log >&2 || fail "Le client 7 n'a pas pu se lancer"
-./client "$SERVER_HOST" "$SERVER_PORT" get "$HASH_EXAMPLE" > /dev/null || fail "Le client 8 n'a pas pu se lancer"
+./client "$SERVER_HOST" "$SERVER_PORT" put "$HASH_EXAMPLE" ::42 & 2> tests.log >&2 || fail "Le client 1 n'a pas pu se lancer"; sleep .1
+./client "$SERVER_HOST" "$SERVER_PORT" put "$HASH_EXAMPLE" localhost & 2> tests.log >&2 || fail "Le client 2 n'a pas pu se lancer"; sleep .1
+./client "$SERVER_HOST" "$SERVER_PORT" put "$HASH_EXAMPLE" ::1 & 2> tests.log >&2 || fail "Le client 3 n'a pas pu se lancer"; sleep .1
+./client "$SERVER_HOST" "$SERVER_PORT" put "$HASH_EXAMPLE"1 ::42 & 2> tests.log >&2 || fail "Le client 4 n'a pas pu se lancer"; sleep .1
+./client "$SERVER_HOST" "$SERVER_PORT" put "$HASH_EXAMPLE"2 ::432 & 2> tests.log >&2 || fail "Le client 5 n'a pas pu se lancer"; sleep .1
+./client "$SERVER_HOST" "$SERVER_PORT" put "$HASH_EXAMPLE"2 ::42 & 2> tests.log >&2 || fail "Le client 6 n'a pas pu se lancer"; sleep .1
+./client "$SERVER_HOST" "$SERVER_PORT" put "$HASH_EXAMPLE"2 ::432 & 2> tests.log >&2 || fail "Le client 7 n'a pas pu se lancer"; sleep .1
+./client "$SERVER_HOST" "$SERVER_PORT" get "$HASH_EXAMPLE" > /dev/null || fail "Le client 8 n'a pas pu se lancer"; sleep .1
 
 # on attend un peu pour éviter de faire les tests suivants avant que tout soit correctement envoyé
 sleep .2
@@ -62,6 +62,16 @@ info "TESTS DES RÉSULTATS ATTENDUS..."
 ./client "$SERVER_HOST" "$SERVER_PORT" get "$HASH_EXAMPLE" | grep "::42" > /dev/null || err "perte d'une IP (::42)"
 ./client "$SERVER_HOST" "$SERVER_PORT" get "$HASH_EXAMPLE"1 | grep "::42" > /dev/null || err "perte d'une IP (::42)"
 ./client "$SERVER_HOST" "$SERVER_PORT" get "$HASH_EXAMPLE"2 | grep "::42" > /dev/null || err "perte d'une IP (::42)"
+
+sleep .2
+
+info "TESTS DU TTL... (30sec; le temps de boire quelques gorgées de café :p)"
+sleep 30
+./client "$SERVER_HOST" "$SERVER_PORT" get "$HASH_EXAMPLE"2 | grep "::432" > /dev/null && fail "soucis 1 avec le TTL !"
+./client "$SERVER_HOST" "$SERVER_PORT" get "$HASH_EXAMPLE" | grep "::1" > /dev/null && fail "soucis 2 avec le TTL !"
+./client "$SERVER_HOST" "$SERVER_PORT" get "$HASH_EXAMPLE" | grep "::42" > /dev/null && fail "soucis 3 avec le TTL !"
+./client "$SERVER_HOST" "$SERVER_PORT" get "$HASH_EXAMPLE"1 | grep "::42" > /dev/null && fail "soucis 4 avec le TTL !"
+./client "$SERVER_HOST" "$SERVER_PORT" get "$HASH_EXAMPLE"2 | grep "::42" > /dev/null && fail "soucis 5 avec le TTL !"
 
 # on laisse le temps de bien tout recevoir avant de stopper le serveur
 sleep .2

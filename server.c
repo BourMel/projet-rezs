@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+#include <errno.h>
+#include <pthread.h>
 #include <arpa/inet.h>
 #include "dht.h"
 
@@ -31,6 +33,31 @@ void reply_str(int sockfd, char * str, struct sockaddr_in6 * client, socklen_t a
   }
 }
 
+// gestion des TTL
+void * manage_ttl(void * arg) {
+  dht d = (dht) arg, p;
+  print_info("I", "TTL_manager OK.");
+
+  while (1) {
+    sleep(1);
+    p = d;
+    while (p != NULL) {
+      // cas des hash immortels (le premier, qui est vide,  par exemple)
+      if (p->ttl > HASH_TTL) {
+        p = p->next;
+        continue;
+      }
+      // on supprime si le hash est obsolète
+      if (p->file != NULL && --p->ttl <= 0) {
+        dht_delete_hash(d, p->file);
+      }
+      p = p->next;
+    }
+  }
+
+  return NULL;
+}
+
 int main(int argc, char **argv) {
   int sockfd;
   char buf[BUFF_MAX_LENGTH];
@@ -43,6 +70,9 @@ int main(int argc, char **argv) {
   char put_ip[INET6_ADDRSTRLEN];
 
   int server_running = 1;
+
+  pthread_t tid[2];
+
 
   // vérifie le nombre d'arguments
   if (argc != 3 && argc != 5) {
@@ -76,6 +106,12 @@ int main(int argc, char **argv) {
   }
 
   dht d = new_dht(NULL); // quand on commence, la table est vide
+
+  // on lance un thread qui va que s'occuper des TTL
+  if ((errno = pthread_create(&tid[0], NULL, manage_ttl, d)) != 0) {
+    perror("pthread_create");
+    exit(EXIT_FAILURE);
+  }
 
   while (server_running) {
     memset(buf, 0, BUFF_MAX_LENGTH);

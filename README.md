@@ -16,7 +16,7 @@ Les informations échangées sont sous forme de chaîne de caractères.
 La première lettre indique le type d'action à effectuer.
 
   - `P` comme **PUT** permet d'envoyer un couple (hash, ip) à un serveur. La
-    chaîne commence sont par `P`, directement suivie par le hash, ensuite une
+    chaîne commence par `P`, directement suivie par le hash, ensuite une
     tabulation (moins de risque accidentel d'insertion par rapport aux espaces),
     puis enfin l'adresse IP.
 

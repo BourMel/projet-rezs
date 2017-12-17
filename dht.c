@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 #include "dht.h"
 
 // affiche une information
@@ -39,6 +40,13 @@ dht_ips new_dht_ips(char * ip) {
   return ips;
 }
 
+// libère la liste chaînée d'IP
+void free_dht_ips(dht_ips i) {
+  if (i == NULL) return;
+  if (i->next != NULL) free_dht_ips(i->next);
+  free(i);
+}
+
 // constructeur pour une dht
 dht new_dht(char * file) {
   int str_len;
@@ -51,7 +59,12 @@ dht new_dht(char * file) {
   d->next = NULL;
 
   // cas de l'initialisation
-  if (file == NULL) return d;
+  if (file == NULL) {
+    d->ttl = INT_MAX;
+    return d;
+  }
+
+  d->ttl = HASH_TTL;
 
   str_len = strlen(file);
   if (str_len < 65) {
@@ -112,6 +125,7 @@ void dht_add(dht d, char * hash, char * ip) {
   }
 
   if (matched_hash) { // dans le cas d'un hash déjà connu
+    d->ttl = HASH_TTL;
     if (d->ips == NULL) d->ips = new_dht_ips(ip);
     else ips_add(d->ips, ip);
   } else { // dans le cas d'un nouveau hash
@@ -141,7 +155,9 @@ void dht_print(dht d) {
   if (d == NULL) return;
   if (d->file != NULL && strlen(d->file) > 0) {
     if (d->ips != NULL) {
-      print_info_str("I", "'%s' chez :", d->file);
+      char b_info[BUFF_MAX_LENGTH];
+      sprintf(b_info, "'%s' [TTL=%d] chez :", d->file, d->ttl);
+      print_info("I", b_info);
       dht_print_ips(d->ips);
     } else {
       print_info_str("I", "Personne ne possède le hash '%s'.", d->file);
@@ -163,6 +179,26 @@ dht dht_find_hash(dht d, char * hash) {
   }
 
   return NULL;
+}
+
+// supprime un hash de la dht
+void dht_delete_hash(dht d, char * hash) {
+  if (d == NULL) return;
+
+  dht prev = d, t;
+
+  // on parcourt toute la table
+  while (d->next != NULL) {
+    prev = d;
+    d = d->next;
+    if (d->file != NULL && !strcmp(d->file, hash)) {
+      t = prev->next; // l'élément courant
+      prev->next = d->next;
+      free_dht_ips(d->ips);
+      free(t);
+      return;
+    }
+  }
 }
 
 // convertit un nom de domaine en adresse IP
