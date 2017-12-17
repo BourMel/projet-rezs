@@ -28,7 +28,7 @@ test: dht.o test.c
 	gcc test.c dht.o -Wextra -Wall -o test
 .PHONY: test_client
 test_client: dht.o test_client.c
-	gcc test_client.c dht.o -Wextra -Wall -o test_client
+	gcc test_client.c dht.o -pthread -Wextra -Wall -o test_client
 .PHONY: test_server
 test_server: dht.o test_server.c
 	gcc test_server.c dht.o -Wextra -Wall -o test_server
