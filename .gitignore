@@ -1,7 +1,4 @@
 server
 client
-hash.o
 dht.o
-test
-test_client
-test_server
+*.log
