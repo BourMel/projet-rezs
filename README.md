@@ -22,16 +22,16 @@ La première lettre indique le type d'action à effectuer.
 
   - `G` comme **GET** permet de demander à un serveur la liste des IP qui
     possèdent le hash. La chaîne commence par `G` et est directement suivie par
-    le hash. Le serveur répondra directement en clair au client IP par IP; le
+    le hash. Le serveur répondra directement en clair au client IP par IP ; le
     fait de faire cela sous forme de plusieurs messages permet en cas de perte
     d'un paquet que le client puisse tout de même recevoir un certain nombre
     d'adresses IP. Si jamais le client ne reçoit pas de réponse au bout de 5
-    secondes (timeout par défaut) il se quitte pour ne pas attendre
+    secondes (timeout par défaut) il quitte pour ne pas attendre
     indéfiniment. Une fois que le serveur a envoyé un message de type `S` (voir
-    après), le client attends une seconde histoire d'être certain d'avoir
+    le point suivant), le client attend une seconde histoire d'être certain d'avoir
     récupéré tous les paquets, puis se termine.
 
-  - `S` comme **STOP**, permet, s'il est envoyé au serveur de le quitter
+  - `S` comme **STOP**, permet, s'il est envoyé au serveur, de l'arrêter
     directement (pratique pour les tests avec la commande `nc`). S'il est envoyé
     au client par le serveur, c'est que le serveur a terminé d'envoyer des
     données au client, et ce dernier peut donc librement fermer le socket
@@ -41,6 +41,8 @@ La première lettre indique le type d'action à effectuer.
     envoie ce message, le serveur affiche simplement le contenu de ses tables
     avec les IP correspondantes; très pratique pour voir si tout se passe comme
     prévu.
+
+  - `A` comme **ADD**, permet d'ajouter un serveur.
 
 
 ## Lancement des tests
