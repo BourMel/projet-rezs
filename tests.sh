@@ -43,7 +43,7 @@ info "TESTS DES ARGUMENTS..."
 ./client "$SERVER_HOST" "$SERVER_PORT" wtf "$HASH_EXAMPLE" ::1 2> tests.log >&2 && fail "Action inconnue (avec IP)"
 
 info "TESTS DES LANCEMENTS..."
-./server "$SERVER_HOST" "$SERVER_PORT"& 2> tests.log >&2 || fail "Le serveur n'a pas pu démarrer"
+./server "$SERVER_HOST" "$SERVER_PORT"& 2> tests.log >&2 || fail "Le serveur n'a pas pu démarrer"; sleep .2
 ./client "$SERVER_HOST" "$SERVER_PORT" put "$HASH_EXAMPLE" ::42 & 2> tests.log >&2 || fail "Le client 1 n'a pas pu se lancer"; sleep .1
 ./client "$SERVER_HOST" "$SERVER_PORT" put "$HASH_EXAMPLE" localhost & 2> tests.log >&2 || fail "Le client 2 n'a pas pu se lancer"; sleep .1
 ./client "$SERVER_HOST" "$SERVER_PORT" put "$HASH_EXAMPLE" ::1 & 2> tests.log >&2 || fail "Le client 3 n'a pas pu se lancer"; sleep .1
