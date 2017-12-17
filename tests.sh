@@ -8,7 +8,7 @@ HASH_EXAMPLE=8NmV2C3vdRN5K2ShsdU8TZUaG04frUFTB7w1mQYndD1TT6gY88NfbhTchRTwiCYAMHH
 # quitte le serveur
 quit_server() {
   info "on quitte le serveur si jamais il était déjà lancé..."
-  nc -w1 -u "$SERVER_HOST" "$SERVER_PORT" << EOF
+  nc -q1 -w1 -u "$SERVER_HOST" "$SERVER_PORT" << EOF
 S
 EOF
 }
